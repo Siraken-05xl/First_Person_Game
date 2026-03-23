@@ -355,10 +355,10 @@ MonoBehaviour:
   target: {fileID: 0}
   targetLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 0
   groundLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 0
   walkPointRange: 8
   timeBetweenAttacks: 1
   projectile: {fileID: 8734632639600932920, guid: 12efda993e7e464498ad535bdfe45ceb, type: 3}
