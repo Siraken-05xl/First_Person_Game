@@ -2306,6 +2306,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4, y: 0, z: 4}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!4 &84148637 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400383574673103366, guid: 69839420563cec9419d276aa124466a4, type: 3}
+  m_PrefabInstance: {fileID: 1326132178269075690}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &85050360
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -37253,6 +37258,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6582218194578085717, guid: 69839420563cec9419d276aa124466a4, type: 3}
   m_PrefabInstance: {fileID: 1326132178269075690}
   m_PrefabAsset: {fileID: 0}
+--- !u!20 &1430090904 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 2984630494821009809, guid: 69839420563cec9419d276aa124466a4, type: 3}
+  m_PrefabInstance: {fileID: 1326132178269075690}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1430852926 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c788660a47278a146829025762843966, type: 3}
@@ -41313,6 +41323,17 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.0000024, y: 0, z: 4.000001}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1537433298 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8326512467102397523, guid: 69839420563cec9419d276aa124466a4, type: 3}
+  m_PrefabInstance: {fileID: 1326132178269075690}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdec7a71ea812964f9512b043f460e9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FPController
 --- !u!1 &1537641266 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 49e38b61965137749b029b2e35ad0e57, type: 3}
@@ -58383,7 +58404,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2204288637280463302, guid: 69839420563cec9419d276aa124466a4, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2204288637280463302, guid: 69839420563cec9419d276aa124466a4, type: 3}
       propertyPath: m_LocalPosition.y
@@ -58449,6 +58470,54 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_ActionId
+      value: c3255eb2-a009-4878-ba64-957e401a294e
+      objectReference: {fileID: 0}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_ActionName
+      value: 'Gameplay/Aim[/Mouse/rightButton]'
+      objectReference: {fileID: 0}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1537433298}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: OnAim
+      objectReference: {fileID: 0}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: FPController, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7503256075458095414, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: m_ActionEvents.Array.data[7].m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 7506814066292005754, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: shootPoint
+      value: 
+      objectReference: {fileID: 84148637}
+    - target: {fileID: 8326512467102397523, guid: 69839420563cec9419d276aa124466a4, type: 3}
+      propertyPath: playerCamera
+      value: 
+      objectReference: {fileID: 1430090904}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -58472,6 +58541,10 @@ PrefabInstance:
     - target: {fileID: 3160239143226429621, guid: c1a9aaacefcf95c41ab02eaf3271349f, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3160239143226429621, guid: c1a9aaacefcf95c41ab02eaf3271349f, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3160239143226429621, guid: c1a9aaacefcf95c41ab02eaf3271349f, type: 3}
       propertyPath: m_TagString
