@@ -1,45 +1,86 @@
 using UnityEngine;
+using UnityEngine.AI; // Necesario para detener el agente al morir
 
 public class EnemyHealth : MonoBehaviour
 {
     [Header("Health System Management")]
-    [SerializeField] int maxHealth = 100; //Vida máxima del enemigo
-    [SerializeField] int health; //Vida actual del enemigo
+    [SerializeField] int maxHealth = 100;
+    [SerializeField] int health;
 
     [Header("Feedback Configuration")]
-    [SerializeField] Material damagedMat; //Material feedback de daño
-    [SerializeField] GameObject deathVfx; //Efecto de partículas de muerte
-    [SerializeField] MeshRenderer enemyRend; //Ref al componente que dibuja los materiales del enemigo en pantalla
-    Material baseMat; //Almacén del material base del enemigo
+    [SerializeField] Material damagedMat;
+    [SerializeField] GameObject deathVfx;
+    [SerializeField] MeshRenderer enemyRend;
+    Material baseMat;
+
+    // Referencias internas para la muerte
+    private Animator anim;
+    private NavMeshAgent agent;
+    private EnemyAIBase aiScript;
+    private bool isDead = false;
 
     private void Awake()
     {
-        health = maxHealth; //La vida se pone en el máximo
-        baseMat = enemyRend.material; //Se referencia el material base
-    }
+        health = maxHealth;
+        if (enemyRend != null) baseMat = enemyRend.material;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (health <= 0)
-        {
-            health = 0; //La vida no puede bajar de cero
-            deathVfx.SetActive(true);
-            deathVfx.transform.position = transform.position;
-            gameObject.SetActive(false); //El enemigo se apaga = "muere"
-        }
+        // Obtenemos las referencias
+        anim = GetComponent<Animator>();
+        agent = GetComponent<NavMeshAgent>();
+        aiScript = GetComponent<EnemyAIBase>();
     }
 
     public void TakeDamage(int damage)
     {
-        health -= damage; //Quitarle una cantidad determinada de vida al enemigo
-        enemyRend.material = damagedMat; //Se cambia al material de feedback de daño
-        Invoke(nameof(ResetEnemyMaterial), 0.1f); //Espera de tiempo que permite ver el parpadeo
+        if (isDead) return; // Si ya está muerto, no hace nada
+
+        health -= damage;
+
+        // Feedback visual de daño
+        if (enemyRend != null && damagedMat != null)
+        {
+            enemyRend.material = damagedMat;
+            Invoke(nameof(ResetEnemyMaterial), 0.1f);
+        }
+
+        // Comprobamos muerte aquí, no en el Update
+        if (health <= 0)
+        {
+            Die();
+        }
     }
 
     void ResetEnemyMaterial()
     {
-        //Devuelve el material del enemigo a su material original
-        enemyRend.material = baseMat;
+        if (enemyRend != null) enemyRend.material = baseMat;
+    }
+
+    void Die()
+    {
+        isDead = true;
+        health = 0;
+
+        // 1. Activar animación de muerte de Mixamo
+        if (anim != null) anim.SetTrigger("Die");
+
+        // 2. Detener movimiento y disparos
+        if (agent != null) agent.isStopped = true;
+        if (aiScript != null) aiScript.enabled = false;
+
+        // 3. Efectos de partículas
+        if (deathVfx != null)
+        {
+            // Es mejor instanciarlo o moverlo, no solo activarlo si es hijo
+            deathVfx.SetActive(true);
+            deathVfx.transform.parent = null; // Para que no se destruya con el enemigo
+        }
+
+        Debug.Log("Enemigo eliminado");
+
+        // 4. Opción: Desactivar el collider para que las balas lo atraviesen al estar en el suelo
+        if (GetComponent<Collider>()) GetComponent<Collider>().enabled = false;
+
+        // Destruir el objeto tras unos segundos para que de tiempo a ver la animación
+        Destroy(gameObject, 4f);
     }
 }
