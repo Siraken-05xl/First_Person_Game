@@ -4,45 +4,21 @@ using UnityEngine.InputSystem;
 
 public class GunSystem : MonoBehaviour
 {
-    #region General Variables
-    [Header("General References")]
+    [Header("Referencias")]
     [SerializeField] Camera fpsCam;
     [SerializeField] Transform shootPoint;
-    [SerializeField] LayerMask impactLayer;
-    RaycastHit hit;
+    [SerializeField] GameObject projectilePrefab;
 
-    [Header("Weapon Parameters")]
-    [SerializeField] int damage = 10;
-    [SerializeField] float range = 100f;
-    [SerializeField] float spread = 0;
-    [SerializeField] float shootingCooldown = 0.2f;
-    [SerializeField] float reloadTime = 1.5f;
-    [SerializeField] bool allowButtonHold = false;
+    [Header("Ajustes de Arma")]
+    [SerializeField] float shootForce = 60f;
+    [SerializeField] float shootingCooldown = 0.15f;
 
-    [Header("Bullet Management")]
-    [SerializeField] int ammoSize = 30;
-    [SerializeField] int bulletsPerTap = 1;
-    [SerializeField] int bulletsLeft;
+    private bool canShoot = true;
 
-    [Header("Feedback References")]
-    [SerializeField] GameObject impactEffect; // VFX que aparecerá donde golpee la bala
-
-    [Header("Dev - Gun State Bools")]
-    [SerializeField] bool shooting;
-    [SerializeField] bool canShoot;
-    [SerializeField] bool reloading;
-    #endregion
-
-    private void Awake()
+    public void OnShoot(InputAction.CallbackContext context)
     {
-        bulletsLeft = ammoSize;
-        canShoot = true;
-    }
-
-    void Update()
-    {
-        // Lógica de disparo automático o semiautomático
-        if (canShoot && shooting && !reloading && bulletsLeft > 0)
+        // Disparo instantáneo al presionar el botón (Input System)
+        if (context.started && canShoot)
         {
             StartCoroutine(ShootRoutine());
         }
@@ -51,83 +27,26 @@ public class GunSystem : MonoBehaviour
     IEnumerator ShootRoutine()
     {
         canShoot = false;
-        if (!allowButtonHold) shooting = false;
-
-        for (int i = 0; i < bulletsPerTap; i++)
-        {
-            if (bulletsLeft <= 0) break;
-            Shoot();
-            bulletsLeft--;
-        }
-
+        ExecuteShot();
         yield return new WaitForSeconds(shootingCooldown);
         canShoot = true;
     }
 
-    void Shoot()
+    void ExecuteShot()
     {
-        Vector3 direction = fpsCam.transform.forward;
+        if (projectilePrefab == null || shootPoint == null) return;
 
-        // Dispersión (Spread)
-        direction.x += Random.Range(-spread, spread);
-        direction.y += Random.Range(-spread, spread);
+        // Instancia el proyectil siguiendo la orientación de la cámara
+        GameObject bullet = Instantiate(projectilePrefab, shootPoint.position, fpsCam.transform.rotation);
 
-        if (Physics.Raycast(fpsCam.transform.position, direction, out hit, range, impactLayer))
+        Rigidbody rb = bullet.GetComponent<Rigidbody>();
+        if (rb != null)
         {
-            Debug.Log("Impacto en: " + hit.collider.name);
+            rb.isKinematic = false;
+            rb.linearVelocity = Vector3.zero; // Limpiar inercias previas
 
-            // 1. EFECTO DE IMPACTO (VFX)
-            if (impactEffect != null)
-            {
-                // Crea el efecto, lo orienta según la superficie del choque y lo destruye a los 2 segundos
-                GameObject impactGO = Instantiate(impactEffect, hit.point, Quaternion.LookRotation(hit.normal));
-                Destroy(impactGO, 2f);
-            }
-
-            // 2. DAÑO AL ENEMIGO
-            // Buscamos el componente en el objeto golpeado O en sus padres (por si golpeas un hueso)
-            EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
-
-            if (enemyHealth != null)
-            {
-                enemyHealth.TakeDamage(damage);
-            }
+            // VelocityChange hace que la bala salga siempre a la misma velocidad sin importar su peso
+            rb.AddForce(fpsCam.transform.forward * shootForce, ForceMode.VelocityChange);
         }
     }
-
-    IEnumerator ReloadRoutine()
-    {
-        reloading = true;
-        yield return new WaitForSeconds(reloadTime);
-        bulletsLeft = ammoSize;
-        reloading = false;
-    }
-
-    void Reload()
-    {
-        if (bulletsLeft < ammoSize && !reloading)
-        {
-            StartCoroutine(ReloadRoutine());
-        }
-    }
-
-    #region Input Methods
-    public void OnShoot(InputAction.CallbackContext context)
-    {
-        if (allowButtonHold)
-        {
-            shooting = context.ReadValueAsButton();
-        }
-        else
-        {
-            if (context.performed) shooting = true;
-            if (context.canceled) shooting = false; // Seguridad para evitar disparos infinitos
-        }
-    }
-
-    public void OnReload(InputAction.CallbackContext context)
-    {
-        if (context.performed) Reload();
-    }
-    #endregion
 }
