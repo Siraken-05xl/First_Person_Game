@@ -15,7 +15,7 @@ public class EnemyAIBase : MonoBehaviour
     [SerializeField] float sightRange = 18f;
     [SerializeField] float attackRange = 8f;
     [SerializeField] float bulletSpeed = 40f;
-    [SerializeField] int damagePerShot = 10;
+    [SerializeField] int damageToPlayer = 10;
 
     float nextAttackTime = 0f;
 
@@ -38,11 +38,22 @@ public class EnemyAIBase : MonoBehaviour
         else if (dist <= sightRange && dist > attackRange) ChaseTarget();
         else AttackTarget();
 
+        // ARREGLO DE ANIMACIONES
         if (anim != null)
-            anim.SetBool("isWalking", agent.velocity.magnitude > 0.1f);
+        {
+            bool isMoving = agent.velocity.magnitude > 0.1f;
+            anim.SetBool("isWalking", isMoving);
+
+            // Si el enemigo empieza a caminar o el jugador se aleja, deja de atacar
+            if (isMoving || dist > attackRange)
+            {
+                anim.SetBool("isAttacking", false);
+            }
+        }
     }
 
     void Patroling() { if (agent.isOnNavMesh) agent.SetDestination(transform.position); }
+
     void ChaseTarget() { if (agent.isOnNavMesh) agent.SetDestination(target.position); }
 
     void AttackTarget()
@@ -54,7 +65,7 @@ public class EnemyAIBase : MonoBehaviour
 
         if (Time.time >= nextAttackTime)
         {
-            if (anim != null) anim.SetTrigger("isAttacking");
+            if (anim != null) anim.SetBool("isAttacking", true);
             Shoot();
             nextAttackTime = Time.time + timeBetweenAttacks;
         }
@@ -67,7 +78,7 @@ public class EnemyAIBase : MonoBehaviour
         Vector3 direction = (target.position - shootPoint.position).normalized;
         GameObject bullet = Instantiate(projectile, shootPoint.position, Quaternion.LookRotation(direction));
 
-        // LIMPIEZA: Se destruye en 1.2 segundos para que no se acumulen
+        // Limpieza rápida de balas del suelo
         Destroy(bullet, 1.2f);
 
         Rigidbody rb = bullet.GetComponent<Rigidbody>();
@@ -77,22 +88,35 @@ public class EnemyAIBase : MonoBehaviour
             rb.linearVelocity = direction * bulletSpeed;
         }
 
-        // DAÑO: Le pegamos este pequeño "chip" a la bala para que detecte al jugador
+        // Añadimos el componente de daño a la bala del enemigo
         CollisionDetection cd = bullet.AddComponent<CollisionDetection>();
-        cd.damage = damagePerShot;
+        cd.damage = damageToPlayer;
+        cd.targetTag = "Player";
     }
 }
 
-// Clase auxiliar para detectar el choque (va en el mismo archivo)
+// Clase para detectar choques (va dentro del mismo archivo de EnemyAIBase)
 public class CollisionDetection : MonoBehaviour
 {
     public int damage;
+    public string targetTag;
+
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag(targetTag))
         {
-            PlayerHealth health = collision.gameObject.GetComponent<PlayerHealth>();
-            if (health != null) health.TakeDamage(damage);
+            if (targetTag == "Player")
+            {
+                PlayerHealth ph = collision.gameObject.GetComponent<PlayerHealth>();
+                if (ph != null) ph.TakeDamage(damage);
+            }
+            else if (targetTag == "Enemy")
+            {
+                // Buscamos el componente de salud en el enemigo o sus padres
+                EnemyHealth eh = collision.gameObject.GetComponentInParent<EnemyHealth>();
+                if (eh != null) eh.TakeDamage(damage);
+            }
+
             Destroy(gameObject);
         }
     }

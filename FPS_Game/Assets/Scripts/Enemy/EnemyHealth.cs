@@ -16,16 +16,22 @@ public class EnemyHealth : MonoBehaviour
 
     void Die()
     {
+        if (isDead) return;
         isDead = true;
 
-        // Detener todos los sistemas de la IA
+        // AVISAR AL GAME MANAGER
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.AddKill();
+        }
+
+        // Desactivar IA
         if (TryGetComponent(out EnemyAIBase ai)) ai.enabled = false;
         if (TryGetComponent(out NavMeshAgent nav)) nav.enabled = false;
 
         Animator anim = GetComponent<Animator>();
         if (anim != null) anim.SetTrigger("Die");
 
-        // El objeto se destruye a los 4 segundos de morir
-        Destroy(gameObject, 4f);
+        Destroy(gameObject, 3f);
     }
 }
