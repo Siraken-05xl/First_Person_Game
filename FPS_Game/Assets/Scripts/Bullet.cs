@@ -1,31 +1,49 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    [Header("Stats")]
     public int damage = 20;
+    public float speed = 40f;
     public float lifeTime = 2.5f;
+
     private float spawnTime;
+    private Rigidbody rb;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     void Start()
     {
         spawnTime = Time.time;
-        // Limpieza automática para no saturar la memoria del juego
+
+        if (rb != null)
+        {
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            rb.linearVelocity = transform.forward * speed;
+        }
+
         Destroy(gameObject, lifeTime);
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        // SEGURO: Ignora colisiones si ocurren en los primeros 0.05 segundos.
-        // Esto evita que la bala choque con el cañón del arma al nacer.
         if (Time.time - spawnTime < 0.05f) return;
 
-        // Intentar hacer daño si el objeto tiene salud
-        if (collision.gameObject.TryGetComponent(out EnemyHealth health))
+        // ðŸ”´ DaÃ±o a enemigos
+        if (collision.gameObject.TryGetComponent(out EnemyHealth enemy))
         {
-            health.TakeDamage(damage);
+            enemy.TakeDamage(damage);
         }
 
-        // Se destruye al impactar con cualquier cosa sólida
+        // ðŸ”µ DaÃ±o al player
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            collision.gameObject.SendMessage("TakeDamage", damage, SendMessageOptions.DontRequireReceiver);
+        }
+
         Destroy(gameObject);
     }
 }
